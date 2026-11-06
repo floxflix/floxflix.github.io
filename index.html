@@ -1,158 +1,188 @@
 <!doctype html>
 <html lang="en" class="scroll-smooth">
+
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Floxflix — Self-hosted video streaming API</title>
-<meta name="description" content="Floxflix is a self-hosted video streaming API written in Go. Upload source files, transcode to HLS with FFmpeg, and stream to authenticated users. Open source, Docker ready, MIT licensed." />
-<meta name="theme-color" content="#08090c" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ff3d3d'/%3E%3Cpath d='M26 20l20 12-20 12z' fill='%2308090c'/%3E%3C/svg%3E" />
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          ink: '#08090c',
-          'ink-soft': '#0b0d12',
-          panel: '#0f1117',
-          panel2: '#12151d',
-          fg: '#eceef2',
-          muted: '#9aa1ad',
-          muted2: '#6f7683',
-          brand: '#ff3d3d',
-          brand2: '#ff8a3d',
-          mint: '#41d18b',
-          sky: '#6aa8ff'
-        },
-        fontFamily: {
-          sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
-          mono: ['ui-monospace', 'SFMono-Regular', 'SF Mono', 'Menlo', 'Consolas', 'Liberation Mono', 'monospace']
-        },
-        boxShadow: {
-          glow: '0 8px 26px rgba(255,61,61,.28)',
-          'glow-lg': '0 12px 32px rgba(255,61,61,.38)',
-          mark: '0 6px 22px rgba(255,61,61,.35)',
-          terminal: '0 30px 80px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.05)',
-          card: '0 24px 60px rgba(0,0,0,.45)'
-        },
-        backgroundImage: {
-          hero: 'radial-gradient(720px 420px at 18% -8%, rgba(255,61,61,.20), transparent 62%), radial-gradient(620px 420px at 92% 8%, rgba(255,138,61,.12), transparent 60%), radial-gradient(900px 500px at 50% 120%, rgba(106,168,255,.07), transparent 60%)',
-          'panel-grad': 'linear-gradient(180deg, #12151d, #0f1117)',
-          'brand-grad': 'linear-gradient(135deg, #ff3d3d, #ff8a3d)',
-          'brand-text': 'linear-gradient(120deg, #ff3d3d 10%, #ff8a3d 55%, #ffd2a8 95%)',
-          'card-glow': 'radial-gradient(420px 180px at 20% 0%, rgba(255,61,61,.10), transparent 70%)',
-          cta: 'radial-gradient(600px 300px at 20% 0%, rgba(255,61,61,.16), transparent 65%), radial-gradient(600px 300px at 85% 100%, rgba(255,138,61,.13), transparent 65%), linear-gradient(180deg, #12151d, #0f1117)'
-        },
-        keyframes: {
-          blink: { '50%': { opacity: '0' } }
-        },
-        animation: {
-          blink: 'blink 1.15s steps(1) infinite'
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Floxflix — Self-hosted video streaming API</title>
+  <meta name="description"
+    content="Floxflix is a self-hosted video streaming API written in Go. Upload source files, transcode to HLS with FFmpeg, and stream to authenticated users. Open source, Docker ready, MIT licensed." />
+  <meta name="theme-color" content="#08090c" />
+  <link rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ff3d3d'/%3E%3Cpath d='M26 20l20 12-20 12z' fill='%2308090c'/%3E%3C/svg%3E" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: '#08090c',
+            'ink-soft': '#0b0d12',
+            panel: '#0f1117',
+            panel2: '#12151d',
+            fg: '#eceef2',
+            muted: '#9aa1ad',
+            muted2: '#6f7683',
+            brand: '#ff3d3d',
+            brand2: '#ff8a3d',
+            mint: '#41d18b',
+            sky: '#6aa8ff'
+          },
+          fontFamily: {
+            sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'SF Mono', 'Menlo', 'Consolas', 'Liberation Mono', 'monospace']
+          },
+          boxShadow: {
+            glow: '0 8px 26px rgba(255,61,61,.28)',
+            'glow-lg': '0 12px 32px rgba(255,61,61,.38)',
+            mark: '0 6px 22px rgba(255,61,61,.35)',
+            terminal: '0 30px 80px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.05)',
+            card: '0 24px 60px rgba(0,0,0,.45)'
+          },
+          backgroundImage: {
+            hero: 'radial-gradient(720px 420px at 18% -8%, rgba(255,61,61,.20), transparent 62%), radial-gradient(620px 420px at 92% 8%, rgba(255,138,61,.12), transparent 60%), radial-gradient(900px 500px at 50% 120%, rgba(106,168,255,.07), transparent 60%)',
+            'panel-grad': 'linear-gradient(180deg, #12151d, #0f1117)',
+            'brand-grad': 'linear-gradient(135deg, #ff3d3d, #ff8a3d)',
+            'brand-text': 'linear-gradient(120deg, #ff3d3d 10%, #ff8a3d 55%, #ffd2a8 95%)',
+            'card-glow': 'radial-gradient(420px 180px at 20% 0%, rgba(255,61,61,.10), transparent 70%)',
+            cta: 'radial-gradient(600px 300px at 20% 0%, rgba(255,61,61,.16), transparent 65%), radial-gradient(600px 300px at 85% 100%, rgba(255,138,61,.13), transparent 65%), linear-gradient(180deg, #12151d, #0f1117)'
+          },
+          keyframes: {
+            blink: { '50%': { opacity: '0' } }
+          },
+          animation: {
+            blink: 'blink 1.15s steps(1) infinite'
+          },
         }
-      }
-    },
-    plugins: [
-      function ({ addUtilities }) {
-        addUtilities({
-          '.bg-grid': {
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px)',
-            backgroundSize: '64px 64px',
-            maskImage: 'radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 78%)',
-            WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 78%)'
-          }
-        });
-      }
-    ]
-  };
-</script>
-<style type="text/tailwindcss">
-  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
-  .reveal.in { opacity: 1; transform: none; }
-  .navlinks.open { transform: none; }
-  .code-card pre[hidden] { display: none; }
-  .tabs button { @apply cursor-pointer rounded-[7px] border-0 bg-transparent px-2.5 py-[5px] font-mono text-[12.5px] text-muted2; }
-  .tabs button.active { @apply bg-white/[.06] text-fg; }
-  .c-comment { @apply text-muted2; }
-  .c-cmd { @apply text-[#e7e9ee]; }
-  .c-flag { @apply text-brand2; }
-  .c-str { @apply text-mint; }
-  .c-key { @apply text-sky; }
-  ::selection { background: rgba(255,61,61,.35); }
-  @media (prefers-reduced-motion: reduce) {
-    .reveal { opacity: 1; transform: none; transition: none; }
-    .cursor { animation: none !important; }
-  }
-</style>
+      },
+      plugins: [
+        function ({ addUtilities }) {
+          addUtilities({
+            '.bg-grid': {
+              backgroundImage: 'linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px)',
+              backgroundSize: '64px 64px',
+              maskImage: 'radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 78%)',
+              WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 78%)'
+            }
+          });
+        }
+      ]
+    };
+  </script>
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body class="m-0 overflow-x-hidden bg-ink font-sans leading-relaxed text-fg antialiased">
 
-<header class="sticky top-0 z-50 border-b border-white/[.08] bg-[rgba(8,9,12,.72)] backdrop-blur-[14px]">
-  <div class="mx-auto max-w-[1120px] px-6 max-[360px]:px-4">
-    <nav class="flex h-[66px] items-center justify-between">
-      <a class="flex items-center gap-[11px] text-lg font-extrabold tracking-tight" href="#top" aria-label="Floxflix home">
-        <span class="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-[9px] bg-brand-grad shadow-mark">
-          <svg class="ml-px h-[15px] w-[15px]" viewBox="0 0 24 24" fill="#160405" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
-        </span>
-        Floxflix
-      </a>
-
-      <div class="navlinks fixed inset-x-0 top-[66px] z-40 flex max-h-[calc(100dvh_-_66px)] -translate-y-[130%] flex-col items-stretch gap-0 overflow-y-auto border-b border-white/[.08] bg-ink px-6 pb-5 pt-2.5 transition-transform duration-300 min-[721px]:static min-[721px]:max-h-none min-[721px]:translate-y-0 min-[721px]:flex-row min-[721px]:items-center min-[721px]:gap-[30px] min-[721px]:overflow-visible min-[721px]:border-0 min-[721px]:bg-transparent min-[721px]:p-0" id="navlinks">
-        <a class="border-b border-white/[.08] py-[13px] text-base text-muted transition-colors hover:text-fg min-[721px]:border-0 min-[721px]:py-0 min-[721px]:text-[14.5px]" href="#features">Features</a>
-        <a class="border-b border-white/[.08] py-[13px] text-base text-muted transition-colors hover:text-fg min-[721px]:border-0 min-[721px]:py-0 min-[721px]:text-[14.5px]" href="#how">How it works</a>
-        <a class="border-b border-white/[.08] py-[13px] text-base text-muted transition-colors hover:text-fg min-[721px]:border-0 min-[721px]:py-0 min-[721px]:text-[14.5px]" href="#api">API</a>
-        <a class="border-b border-white/[.08] py-[13px] text-base text-muted transition-colors hover:text-fg min-[721px]:border-0 min-[721px]:py-0 min-[721px]:text-[14.5px]" href="https://github.com/floxflix/flixflox" target="_blank" rel="noopener">GitHub</a>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <a class="inline-flex items-center justify-center gap-[9px] whitespace-nowrap rounded-[10px] border border-white/[.14] bg-white/[.04] px-[18px] py-[11px] text-sm font-[650] text-fg transition hover:bg-white/[.08] max-[720px]:hidden" href="https://github.com/floxflix/flixflox" target="_blank" rel="noopener">
-          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 016 0C17.3 4.6 18.3 5 18.3 5c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
-          Star on GitHub
+  <header class="sticky top-0 z-50 border-b border-white/[.08] bg-[rgba(8,9,12,.72)] backdrop-blur-[14px]">
+    <div class="mx-auto max-w-[1120px] px-6 max-[360px]:px-4">
+      <nav class="flex h-[66px] items-center justify-between">
+        <a class="flex items-center gap-[11px] text-lg font-extrabold tracking-tight" href="#top"
+          aria-label="Floxflix home">
+          <span class="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-[9px] bg-brand-grad shadow-mark">
+            <svg class="ml-px h-[15px] w-[15px]" viewBox="0 0 24 24" fill="#160405" aria-hidden="true">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </span>
+          Floxflix
         </a>
-        <a class="inline-flex items-center justify-center gap-[9px] whitespace-nowrap rounded-[10px] border border-transparent bg-brand-grad px-[18px] py-[11px] text-sm font-[650] text-[#160405] shadow-glow transition hover:-translate-y-px hover:shadow-glow-lg" href="#start">Get started</a>
-        <button class="menu-toggle hidden cursor-pointer border-0 bg-transparent p-2 text-fg max-[720px]:block" id="menuToggle" aria-label="Toggle menu" aria-expanded="false">
-          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-        </button>
-      </div>
-    </nav>
-  </div>
-</header>
 
-<main id="top">
+        <div
+          class="navlinks fixed inset-x-0 top-[66px] z-40 flex max-h-[calc(100dvh_-_66px)] -translate-y-[130%] flex-col items-stretch gap-0 overflow-y-auto border-b border-white/[.08] bg-ink px-6 pb-5 pt-2.5 transition-transform duration-300 min-[721px]:static min-[721px]:max-h-none min-[721px]:translate-y-0 min-[721px]:flex-row min-[721px]:items-center min-[721px]:gap-[30px] min-[721px]:overflow-visible min-[721px]:border-0 min-[721px]:bg-transparent min-[721px]:p-0"
+          id="navlinks">
+          <a class="border-b border-white/[.08] py-[13px] text-base text-muted transition-colors hover:text-fg min-[721px]:border-0 min-[721px]:py-0 min-[721px]:text-[14.5px]"
+            href="#features">Features</a>
+          <a class="border-b border-white/[.08] py-[13px] text-base text-muted transition-colors hover:text-fg min-[721px]:border-0 min-[721px]:py-0 min-[721px]:text-[14.5px]"
+            href="#how">How it works</a>
+          <a class="border-b border-white/[.08] py-[13px] text-base text-muted transition-colors hover:text-fg min-[721px]:border-0 min-[721px]:py-0 min-[721px]:text-[14.5px]"
+            href="#api">API</a>
+          <a class="border-b border-white/[.08] py-[13px] text-base text-muted transition-colors hover:text-fg min-[721px]:border-0 min-[721px]:py-0 min-[721px]:text-[14.5px]"
+            href="https://github.com/floxflix/flixflox" target="_blank" rel="noopener">GitHub</a>
+        </div>
 
-  <!-- HERO -->
-  <section class="hero relative overflow-hidden pt-[88px] pb-[72px] max-[940px]:pb-14 max-[940px]:pt-[72px]">
-    <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-hero"></div>
-    <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-grid opacity-35"></div>
-    <div class="relative z-[2] mx-auto grid max-w-[1120px] grid-cols-[1.08fr_0.92fr] items-center gap-14 px-6 max-[940px]:grid-cols-1 max-[940px]:gap-[42px]">
-      <div class="min-w-0">
-        <span class="reveal inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[.14em] text-muted"><span class="h-1.5 w-1.5 rounded-full bg-brand shadow-[0_0_12px_#ff3d3d]"></span> Self-hosted &middot; Open source &middot; MIT</span>
-        <h1 class="reveal mt-[22px] text-[clamp(38px,5.2vw,62px)] font-[820] leading-[1.04] tracking-[-.035em]">Your video.<br />Your server.<br /><span class="bg-brand-text bg-clip-text text-transparent">Your rules.</span></h1>
-        <p class="reveal mt-[22px] max-w-[540px] text-lg text-muted">
-          Floxflix is a self-hosted video streaming API written in Go. Upload source files,
-          let FFmpeg transcode them to HLS in the background, and stream to your own users —
-          with authenticated profiles and zero third-party cloud.
-        </p>
-        <div class="reveal mt-[34px] flex flex-wrap gap-3.5">
-          <a class="inline-flex items-center justify-center gap-[9px] whitespace-nowrap rounded-[10px] border border-transparent bg-brand-grad px-[18px] py-[11px] text-sm font-[650] text-[#160405] shadow-glow transition hover:-translate-y-px hover:shadow-glow-lg max-[420px]:w-full" href="#start">
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
-            Deploy in minutes
+        <div class="flex items-center gap-3">
+          <a class="inline-flex items-center justify-center gap-[9px] whitespace-nowrap rounded-[10px] border border-white/[.14] bg-white/[.04] px-[18px] py-[11px] text-sm font-[650] text-fg transition hover:bg-white/[.08] max-[720px]:hidden"
+            href="https://github.com/floxflix/flixflox" target="_blank" rel="noopener">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 016 0C17.3 4.6 18.3 5 18.3 5c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z" />
+            </svg>
+            Star on GitHub
           </a>
-          <a class="inline-flex items-center justify-center gap-[9px] whitespace-nowrap rounded-[10px] border border-white/[.14] bg-white/[.04] px-[18px] py-[11px] text-sm font-[650] text-fg transition hover:bg-white/[.08] max-[420px]:w-full" href="#api">Explore the API</a>
+          <a class="inline-flex items-center justify-center gap-[9px] whitespace-nowrap rounded-[10px] border border-transparent bg-brand-grad px-[18px] py-[11px] text-sm font-[650] text-[#160405] shadow-glow transition hover:-translate-y-px hover:shadow-glow-lg"
+            href="#start">Get started</a>
+          <button class="menu-toggle hidden cursor-pointer border-0 bg-transparent p-2 text-fg max-[720px]:block"
+            id="menuToggle" aria-label="Toggle menu" aria-expanded="false">
+            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round">
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          </button>
         </div>
-        <div class="reveal mt-[34px] flex flex-wrap gap-[22px] text-[13px] text-muted2">
-          <span class="inline-flex items-center gap-[7px]"><svg class="h-[15px] w-[15px] text-mint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Docker ready</span>
-          <span class="inline-flex items-center gap-[7px]"><svg class="h-[15px] w-[15px] text-mint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> No vendor lock-in</span>
-          <span class="inline-flex items-center gap-[7px]"><svg class="h-[15px] w-[15px] text-mint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> OpenAPI contract</span>
-        </div>
-      </div>
+      </nav>
+    </div>
+  </header>
 
-      <div class="reveal min-w-0 overflow-hidden rounded-2xl border border-white/[.14] bg-panel-grad shadow-terminal" aria-label="Quick start terminal">
-        <div class="flex items-center gap-2 border-b border-white/[.08] bg-white/[.02] px-4 py-[13px]">
-          <span class="h-[11px] w-[11px] rounded-full bg-[#ff5f57]"></span><span class="h-[11px] w-[11px] rounded-full bg-[#febc2e]"></span><span class="h-[11px] w-[11px] rounded-full bg-[#28c840]"></span>
-          <span class="ml-2 font-mono text-xs text-muted2">~/flixflox</span>
+  <main id="top">
+
+    <!-- HERO -->
+    <section class="hero relative overflow-hidden pt-[88px] pb-[72px] max-[940px]:pb-14 max-[940px]:pt-[72px]">
+      <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-hero"></div>
+      <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-grid opacity-35"></div>
+      <div
+        class="relative z-[2] mx-auto grid max-w-[1120px] grid-cols-[1.08fr_0.92fr] items-center gap-14 px-6 max-[940px]:grid-cols-1 max-[940px]:gap-[42px]">
+        <div class="min-w-0">
+          <span
+            class="reveal inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[.14em] text-muted"><span
+              class="h-1.5 w-1.5 rounded-full bg-brand shadow-[0_0_12px_#ff3d3d]"></span> Self-hosted &middot; Open
+            source &middot; MIT</span>
+          <h1 class="reveal mt-[22px] text-[clamp(38px,5.2vw,62px)] font-[820] leading-[1.04] tracking-[-.035em]">Your
+            video.<br />Your server.<br /><span class="bg-brand-text bg-clip-text text-transparent">Your rules.</span>
+          </h1>
+          <p class="reveal mt-[22px] max-w-[540px] text-lg text-muted">
+            Floxflix is a self-hosted video streaming API written in Go. Upload source files,
+            let FFmpeg transcode them to HLS in the background, and stream to your own users —
+            with authenticated profiles and zero third-party cloud.
+          </p>
+          <div class="reveal mt-[34px] flex flex-wrap gap-3.5">
+            <a class="inline-flex items-center justify-center gap-[9px] whitespace-nowrap rounded-[10px] border border-transparent bg-brand-grad px-[18px] py-[11px] text-sm font-[650] text-[#160405] shadow-glow transition hover:-translate-y-px hover:shadow-glow-lg max-[420px]:w-full"
+              href="#start">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              Deploy in minutes
+            </a>
+            <a class="inline-flex items-center justify-center gap-[9px] whitespace-nowrap rounded-[10px] border border-white/[.14] bg-white/[.04] px-[18px] py-[11px] text-sm font-[650] text-fg transition hover:bg-white/[.08] max-[420px]:w-full"
+              href="#api">Explore the API</a>
+          </div>
+          <div class="reveal mt-[34px] flex flex-wrap gap-[22px] text-[13px] text-muted2">
+            <span class="inline-flex items-center gap-[7px]"><svg class="h-[15px] w-[15px] text-mint"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M20 6L9 17l-5-5" />
+              </svg> Docker ready</span>
+            <span class="inline-flex items-center gap-[7px]"><svg class="h-[15px] w-[15px] text-mint"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M20 6L9 17l-5-5" />
+              </svg> No vendor lock-in</span>
+            <span class="inline-flex items-center gap-[7px]"><svg class="h-[15px] w-[15px] text-mint"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M20 6L9 17l-5-5" />
+              </svg> OpenAPI contract</span>
+          </div>
         </div>
-        <pre class="m-0 overflow-x-auto px-[18px] py-5 font-mono text-[13px] leading-[1.85]"><span class="c-comment"># clone the repo</span>
+
+        <div class="reveal min-w-0 overflow-hidden rounded-2xl border border-white/[.14] bg-panel-grad shadow-terminal"
+          aria-label="Quick start terminal">
+          <div class="flex items-center gap-2 border-b border-white/[.08] bg-white/[.02] px-4 py-[13px]">
+            <span class="h-[11px] w-[11px] rounded-full bg-[#ff5f57]"></span><span
+              class="h-[11px] w-[11px] rounded-full bg-[#febc2e]"></span><span
+              class="h-[11px] w-[11px] rounded-full bg-[#28c840]"></span>
+            <span class="ml-2 font-mono text-xs text-muted2">~/flixflox</span>
+          </div>
+          <pre class="m-0 overflow-x-auto px-[18px] py-5 font-mono text-[13px] leading-[1.85]"><span class="c-comment"># clone the repo</span>
 <span class="c-cmd">git clone</span> <span class="c-str">https://github.com/floxflix/flixflox</span>
 <span class="c-cmd">cd</span> flixflox
 
@@ -164,129 +194,223 @@
 
 <span class="c-comment">✔ API listening on http://localhost:7777</span>
 <span class="cursor inline-block h-[15px] w-2 animate-blink bg-brand align-[-2px]"></span></pre>
-      </div>
-    </div>
-  </section>
-
-  <!-- STACK -->
-  <div class="border-y border-white/[.08] bg-white/[.012]">
-    <div class="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-5 px-6 py-6 max-[720px]:justify-start">
-      <span class="text-xs font-semibold uppercase tracking-[.16em] text-muted2">Built with</span>
-      <div class="flex flex-wrap items-center gap-x-[34px] gap-y-3">
-        <span class="inline-flex items-center gap-2 font-mono text-[13.5px] text-muted"><i class="h-[5px] w-[5px] rounded-full bg-brand opacity-70"></i>Go 1.26</span>
-        <span class="inline-flex items-center gap-2 font-mono text-[13.5px] text-muted"><i class="h-[5px] w-[5px] rounded-full bg-brand opacity-70"></i>FFmpeg &middot; HLS</span>
-        <span class="inline-flex items-center gap-2 font-mono text-[13.5px] text-muted"><i class="h-[5px] w-[5px] rounded-full bg-brand opacity-70"></i>MongoDB 8</span>
-        <span class="inline-flex items-center gap-2 font-mono text-[13.5px] text-muted"><i class="h-[5px] w-[5px] rounded-full bg-brand opacity-70"></i>chi router</span>
-        <span class="inline-flex items-center gap-2 font-mono text-[13.5px] text-muted"><i class="h-[5px] w-[5px] rounded-full bg-brand opacity-70"></i>Docker</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- FEATURES -->
-  <section class="py-[92px] max-[720px]:py-[66px]" id="features">
-    <div class="mx-auto max-w-[1120px] px-6">
-      <div class="reveal mb-[52px] max-w-[660px]">
-        <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[.14em] text-muted"><span class="h-1.5 w-1.5 rounded-full bg-brand shadow-[0_0_12px_#ff3d3d]"></span> What you get</span>
-        <h2 class="mt-4 text-[clamp(28px,3.6vw,40px)] font-[780] leading-[1.12] tracking-[-.03em]">Everything you need to stream, nothing you don't.</h2>
-        <p class="mt-4 text-[16.5px] text-muted">A focused API for hosting your own library. Upload, transcode, authenticate and stream — without a bloated stack.</p>
-      </div>
-
-      <div class="grid grid-cols-3 gap-[18px] max-[940px]:grid-cols-2 max-[720px]:grid-cols-1">
-        <article class="reveal group relative overflow-hidden rounded-2xl border border-white/[.08] bg-panel-grad p-[26px] transition duration-200 hover:-translate-y-[3px] hover:border-white/[.14] after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-card-glow after:opacity-0 after:transition-opacity hover:after:opacity-100">
-          <div class="mb-[18px] grid h-[42px] w-[42px] place-items-center rounded-[11px] border border-brand/20 bg-brand/10 text-brand2"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5a2 2 0 012-2h2M4 17v2a2 2 0 002 2h2M20 7V5a2 2 0 00-2-2h-2M20 17v2a2 2 0 01-2 2h-2M10 9l5 3-5 3z"/></svg></div>
-          <h3 class="mb-2 text-[16.5px] font-bold tracking-[-.01em]">HLS streaming</h3>
-          <p class="text-[14.5px] leading-[1.65] text-muted">Source files are transcoded to adaptive HLS segments and served as <code>.m3u8</code>, <code>.ts</code>, <code>.m4s</code> or <code>.mp4</code> — playable in any modern browser or player.</p>
-        </article>
-
-        <article class="reveal group relative overflow-hidden rounded-2xl border border-white/[.08] bg-panel-grad p-[26px] transition duration-200 hover:-translate-y-[3px] hover:border-white/[.14] after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-card-glow after:opacity-0 after:transition-opacity hover:after:opacity-100">
-          <div class="mb-[18px] grid h-[42px] w-[42px] place-items-center rounded-[11px] border border-brand/20 bg-brand/10 text-brand2"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
-          <h3 class="mb-2 text-[16.5px] font-bold tracking-[-.01em]">JWT authentication</h3>
-          <p class="text-[14.5px] leading-[1.65] text-muted">Access and refresh tokens delivered as HTTP-only cookies, with bearer-token support for non-browser clients. Passwords hashed, sessions revocable.</p>
-        </article>
-
-        <article class="reveal group relative overflow-hidden rounded-2xl border border-white/[.08] bg-panel-grad p-[26px] transition duration-200 hover:-translate-y-[3px] hover:border-white/[.14] after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-card-glow after:opacity-0 after:transition-opacity hover:after:opacity-100">
-          <div class="mb-[18px] grid h-[42px] w-[42px] place-items-center rounded-[11px] border border-brand/20 bg-brand/10 text-brand2"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
-          <h3 class="mb-2 text-[16.5px] font-bold tracking-[-.01em]">Viewer profiles</h3>
-          <p class="text-[14.5px] leading-[1.65] text-muted">Netflix-style multi-profile support. Each account can create its own viewers, so everyone gets their own space under one login.</p>
-        </article>
-
-        <article class="reveal group relative overflow-hidden rounded-2xl border border-white/[.08] bg-panel-grad p-[26px] transition duration-200 hover:-translate-y-[3px] hover:border-white/[.14] after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-card-glow after:opacity-0 after:transition-opacity hover:after:opacity-100">
-          <div class="mb-[18px] grid h-[42px] w-[42px] place-items-center rounded-[11px] border border-brand/20 bg-brand/10 text-brand2"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg></div>
-          <h3 class="mb-2 text-[16.5px] font-bold tracking-[-.01em]">Upload &amp; transcode</h3>
-          <p class="text-[14.5px] leading-[1.65] text-muted">Multipart uploads for <code>mp4</code>, <code>mkv</code>, <code>mov</code>, <code>avi</code>, <code>webm</code> and more. FFmpeg converts every file automatically — no manual encoding.</p>
-        </article>
-
-        <article class="reveal group relative overflow-hidden rounded-2xl border border-white/[.08] bg-panel-grad p-[26px] transition duration-200 hover:-translate-y-[3px] hover:border-white/[.14] after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-card-glow after:opacity-0 after:transition-opacity hover:after:opacity-100">
-          <div class="mb-[18px] grid h-[42px] w-[42px] place-items-center rounded-[11px] border border-brand/20 bg-brand/10 text-brand2"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
-          <h3 class="mb-2 text-[16.5px] font-bold tracking-[-.01em]">Background queue</h3>
-          <p class="text-[14.5px] leading-[1.65] text-muted">Transcoding runs in a worker queue with status, start and cleanup endpoints. Uploads return immediately while jobs process in the background.</p>
-        </article>
-
-        <article class="reveal group relative overflow-hidden rounded-2xl border border-white/[.08] bg-panel-grad p-[26px] transition duration-200 hover:-translate-y-[3px] hover:border-white/[.14] after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-card-glow after:opacity-0 after:transition-opacity hover:after:opacity-100">
-          <div class="mb-[18px] grid h-[42px] w-[42px] place-items-center rounded-[11px] border border-brand/20 bg-brand/10 text-brand2"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 012-2h9l5 5v11a2 2 0 01-2 2H6a2 2 0 01-2-2z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></div>
-          <h3 class="mb-2 text-[16.5px] font-bold tracking-[-.01em]">OpenAPI contract</h3>
-          <p class="text-[14.5px] leading-[1.65] text-muted">A complete <code>openapi.yml</code> and Postman collection ship with the project. Point Swagger, Redoc or your own client generator at it.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- HOW IT WORKS -->
-  <section class="border-y border-white/[.08] bg-ink-soft py-[92px] max-[720px]:py-[66px]" id="how">
-    <div class="mx-auto max-w-[1120px] px-6">
-      <div class="reveal mb-[52px] max-w-[660px]">
-        <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[.14em] text-muted"><span class="h-1.5 w-1.5 rounded-full bg-brand shadow-[0_0_12px_#ff3d3d]"></span> How it works</span>
-        <h2 class="mt-4 text-[clamp(28px,3.6vw,40px)] font-[780] leading-[1.12] tracking-[-.03em]">From a file on disk to a stream in the browser.</h2>
-        <p class="mt-4 text-[16.5px] text-muted">Three moving parts. No media server daemon to babysit, no proprietary format.</p>
-      </div>
-
-      <div class="grid grid-cols-3 gap-[18px] max-[720px]:grid-cols-1">
-        <div class="reveal relative rounded-2xl border border-white/[.08] bg-white/[.018] px-6 pb-[26px] pt-7">
-          <span class="mb-4 inline-block font-mono text-[13px] font-semibold text-brand">01</span>
-          <h3 class="mb-2 text-[17px] font-bold">Upload your source</h3>
-          <p class="text-[14.5px] text-muted">POST a video file with its title, year, genre and cast. Movies and TV episodes are organized on disk automatically.</p>
         </div>
-        <div class="reveal relative rounded-2xl border border-white/[.08] bg-white/[.018] px-6 pb-[26px] pt-7">
-          <span class="mb-4 inline-block font-mono text-[13px] font-semibold text-brand">02</span>
-          <h3 class="mb-2 text-[17px] font-bold">FFmpeg transcodes it</h3>
-          <p class="text-[14.5px] text-muted">The background queue converts the source into HLS segments and a playlist, then marks the job complete.</p>
-        </div>
-        <div class="reveal relative rounded-2xl border border-white/[.08] bg-white/[.018] px-6 pb-[26px] pt-7">
-          <span class="mb-4 inline-block font-mono text-[13px] font-semibold text-brand">03</span>
-          <h3 class="mb-2 text-[17px] font-bold">Stream to your users</h3>
-          <p class="text-[14.5px] text-muted">Authenticated clients hit the streaming endpoint and play the HLS output — browser, mobile app or TV client.</p>
+      </div>
+    </section>
+
+    <!-- STACK -->
+    <div class="border-y border-white/[.08] bg-white/[.012]">
+      <div
+        class="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-5 px-6 py-6 max-[720px]:justify-start">
+        <span class="text-xs font-semibold uppercase tracking-[.16em] text-muted2">Built with</span>
+        <div class="flex flex-wrap items-center gap-x-[34px] gap-y-3">
+          <span class="inline-flex items-center gap-2 font-mono text-[13.5px] text-muted"><i
+              class="h-[5px] w-[5px] rounded-full bg-brand opacity-70"></i>Go 1.26</span>
+          <span class="inline-flex items-center gap-2 font-mono text-[13.5px] text-muted"><i
+              class="h-[5px] w-[5px] rounded-full bg-brand opacity-70"></i>FFmpeg &middot; HLS</span>
+          <span class="inline-flex items-center gap-2 font-mono text-[13.5px] text-muted"><i
+              class="h-[5px] w-[5px] rounded-full bg-brand opacity-70"></i>MongoDB 8</span>
+          <span class="inline-flex items-center gap-2 font-mono text-[13.5px] text-muted"><i
+              class="h-[5px] w-[5px] rounded-full bg-brand opacity-70"></i>chi router</span>
+          <span class="inline-flex items-center gap-2 font-mono text-[13.5px] text-muted"><i
+              class="h-[5px] w-[5px] rounded-full bg-brand opacity-70"></i>Docker</span>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- API -->
-  <section class="py-[92px] max-[720px]:py-[66px]" id="api">
-    <div class="mx-auto grid max-w-[1120px] grid-cols-[1fr_1.05fr] items-center gap-[52px] px-6 max-[940px]:grid-cols-1 max-[940px]:gap-9">
-      <div class="reveal min-w-0">
-        <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[.14em] text-muted"><span class="h-1.5 w-1.5 rounded-full bg-brand shadow-[0_0_12px_#ff3d3d]"></span> Developer first</span>
-        <h2 class="mt-4 text-[clamp(28px,3.4vw,38px)] font-[780] leading-[1.12] tracking-[-.03em]">A clean API under <span class="text-brand2">/v1/api</span></h2>
-        <p class="mt-4 max-w-[460px] text-base text-muted">Everything is JSON, errors have one consistent shape, and the routes are grouped by concern. Health checks live at <code>/healthz</code> for your orchestrator.</p>
-        <ul class="mt-7 grid max-w-[460px] list-none gap-2.5 p-0">
-          <li class="flex items-center gap-3 rounded-[10px] border border-white/[.08] bg-white/[.018] px-[13px] py-2.5 font-mono text-[13px] text-muted"><span class="shrink-0 rounded-[5px] bg-brand2/[.12] px-[7px] py-0.5 text-[10.5px] font-bold tracking-[.04em] text-brand2">POST</span> /v1/api/auth/login</li>
-          <li class="flex items-center gap-3 rounded-[10px] border border-white/[.08] bg-white/[.018] px-[13px] py-2.5 font-mono text-[13px] text-muted"><span class="shrink-0 rounded-[5px] bg-mint/[.12] px-[7px] py-0.5 text-[10.5px] font-bold tracking-[.04em] text-mint">GET</span> /v1/api/videos/stream/&lt;path&gt;</li>
-          <li class="flex items-center gap-3 rounded-[10px] border border-white/[.08] bg-white/[.018] px-[13px] py-2.5 font-mono text-[13px] text-muted"><span class="shrink-0 rounded-[5px] bg-brand2/[.12] px-[7px] py-0.5 text-[10.5px] font-bold tracking-[.04em] text-brand2">POST</span> /v1/api/videos/upload</li>
-          <li class="flex items-center gap-3 rounded-[10px] border border-white/[.08] bg-white/[.018] px-[13px] py-2.5 font-mono text-[13px] text-muted"><span class="shrink-0 rounded-[5px] bg-sky/[.12] px-[7px] py-0.5 text-[10.5px] font-bold tracking-[.04em] text-sky">PUT</span> /v1/api/videos/{id}/new-episode</li>
-          <li class="flex items-center gap-3 rounded-[10px] border border-white/[.08] bg-white/[.018] px-[13px] py-2.5 font-mono text-[13px] text-muted"><span class="shrink-0 rounded-[5px] bg-mint/[.12] px-[7px] py-0.5 text-[10.5px] font-bold tracking-[.04em] text-mint">GET</span> /v1/api/videos/queue/info</li>
-        </ul>
+    <!-- FEATURES -->
+    <section class="py-[92px] max-[720px]:py-[66px]" id="features">
+      <div class="mx-auto max-w-[1120px] px-6">
+        <div class="reveal mb-[52px] max-w-[660px]">
+          <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[.14em] text-muted"><span
+              class="h-1.5 w-1.5 rounded-full bg-brand shadow-[0_0_12px_#ff3d3d]"></span> What you get</span>
+          <h2 class="mt-4 text-[clamp(28px,3.6vw,40px)] font-[780] leading-[1.12] tracking-[-.03em]">Everything you need
+            to stream, nothing you don't.</h2>
+          <p class="mt-4 text-[16.5px] text-muted">A focused API for hosting your own library. Upload, transcode,
+            authenticate and stream — without a bloated stack.</p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-[18px] max-[940px]:grid-cols-2 max-[720px]:grid-cols-1">
+          <article
+            class="reveal group relative overflow-hidden rounded-2xl border border-white/[.08] bg-panel-grad p-[26px] transition duration-200 hover:-translate-y-[3px] hover:border-white/[.14] after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-card-glow after:opacity-0 after:transition-opacity hover:after:opacity-100">
+            <div
+              class="mb-[18px] grid h-[42px] w-[42px] place-items-center rounded-[11px] border border-brand/20 bg-brand/10 text-brand2">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M4 7V5a2 2 0 012-2h2M4 17v2a2 2 0 002 2h2M20 7V5a2 2 0 00-2-2h-2M20 17v2a2 2 0 01-2 2h-2M10 9l5 3-5 3z" />
+              </svg></div>
+            <h3 class="mb-2 text-[16.5px] font-bold tracking-[-.01em]">HLS streaming</h3>
+            <p class="text-[14.5px] leading-[1.65] text-muted">Source files are transcoded to adaptive HLS segments and
+              served as <code>.m3u8</code>, <code>.ts</code>, <code>.m4s</code> or <code>.mp4</code> — playable in any
+              modern browser or player.</p>
+          </article>
+
+          <article
+            class="reveal group relative overflow-hidden rounded-2xl border border-white/[.08] bg-panel-grad p-[26px] transition duration-200 hover:-translate-y-[3px] hover:border-white/[.14] after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-card-glow after:opacity-0 after:transition-opacity hover:after:opacity-100">
+            <div
+              class="mb-[18px] grid h-[42px] w-[42px] place-items-center rounded-[11px] border border-brand/20 bg-brand/10 text-brand2">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z" />
+                <path d="M9 12l2 2 4-4" />
+              </svg></div>
+            <h3 class="mb-2 text-[16.5px] font-bold tracking-[-.01em]">JWT authentication</h3>
+            <p class="text-[14.5px] leading-[1.65] text-muted">Access and refresh tokens delivered as HTTP-only cookies,
+              with bearer-token support for non-browser clients. Passwords hashed, sessions revocable.</p>
+          </article>
+
+          <article
+            class="reveal group relative overflow-hidden rounded-2xl border border-white/[.08] bg-panel-grad p-[26px] transition duration-200 hover:-translate-y-[3px] hover:border-white/[.14] after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-card-glow after:opacity-0 after:transition-opacity hover:after:opacity-100">
+            <div
+              class="mb-[18px] grid h-[42px] w-[42px] place-items-center rounded-[11px] border border-brand/20 bg-brand/10 text-brand2">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+              </svg></div>
+            <h3 class="mb-2 text-[16.5px] font-bold tracking-[-.01em]">Viewer profiles</h3>
+            <p class="text-[14.5px] leading-[1.65] text-muted">Netflix-style multi-profile support. Each account can
+              create its own viewers, so everyone gets their own space under one login.</p>
+          </article>
+
+          <article
+            class="reveal group relative overflow-hidden rounded-2xl border border-white/[.08] bg-panel-grad p-[26px] transition duration-200 hover:-translate-y-[3px] hover:border-white/[.14] after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-card-glow after:opacity-0 after:transition-opacity hover:after:opacity-100">
+            <div
+              class="mb-[18px] grid h-[42px] w-[42px] place-items-center rounded-[11px] border border-brand/20 bg-brand/10 text-brand2">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3v12M7 10l5 5 5-5" />
+                <path d="M5 21h14" />
+              </svg></div>
+            <h3 class="mb-2 text-[16.5px] font-bold tracking-[-.01em]">Upload &amp; transcode</h3>
+            <p class="text-[14.5px] leading-[1.65] text-muted">Multipart uploads for <code>mp4</code>, <code>mkv</code>,
+              <code>mov</code>, <code>avi</code>, <code>webm</code> and more. FFmpeg converts every file automatically —
+              no manual encoding.</p>
+          </article>
+
+          <article
+            class="reveal group relative overflow-hidden rounded-2xl border border-white/[.08] bg-panel-grad p-[26px] transition duration-200 hover:-translate-y-[3px] hover:border-white/[.14] after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-card-glow after:opacity-0 after:transition-opacity hover:after:opacity-100">
+            <div
+              class="mb-[18px] grid h-[42px] w-[42px] place-items-center rounded-[11px] border border-brand/20 bg-brand/10 text-brand2">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7v5l3 2" />
+              </svg></div>
+            <h3 class="mb-2 text-[16.5px] font-bold tracking-[-.01em]">Background queue</h3>
+            <p class="text-[14.5px] leading-[1.65] text-muted">Transcoding runs in a worker queue with status, start and
+              cleanup endpoints. Uploads return immediately while jobs process in the background.</p>
+          </article>
+
+          <article
+            class="reveal group relative overflow-hidden rounded-2xl border border-white/[.08] bg-panel-grad p-[26px] transition duration-200 hover:-translate-y-[3px] hover:border-white/[.14] after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-card-glow after:opacity-0 after:transition-opacity hover:after:opacity-100">
+            <div
+              class="mb-[18px] grid h-[42px] w-[42px] place-items-center rounded-[11px] border border-brand/20 bg-brand/10 text-brand2">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19V5a2 2 0 012-2h9l5 5v11a2 2 0 01-2 2H6a2 2 0 01-2-2z" />
+                <path d="M14 3v6h6M8 13h8M8 17h5" />
+              </svg></div>
+            <h3 class="mb-2 text-[16.5px] font-bold tracking-[-.01em]">OpenAPI contract</h3>
+            <p class="text-[14.5px] leading-[1.65] text-muted">A complete <code>openapi.yml</code> and Postman
+              collection ship with the project. Point Swagger, Redoc or your own client generator at it.</p>
+          </article>
+        </div>
       </div>
+    </section>
 
-      <div class="code-card reveal min-w-0 overflow-hidden rounded-2xl border border-white/[.14] bg-panel-grad shadow-card">
-        <div class="flex items-center justify-between border-b border-white/[.08] bg-white/[.02] px-4 py-3.5">
-          <div class="tabs flex gap-1.5">
-            <button class="active" data-tab="login">login</button>
-            <button data-tab="upload">upload</button>
-            <button data-tab="queue">queue</button>
+    <!-- HOW IT WORKS -->
+    <section class="border-y border-white/[.08] bg-ink-soft py-[92px] max-[720px]:py-[66px]" id="how">
+      <div class="mx-auto max-w-[1120px] px-6">
+        <div class="reveal mb-[52px] max-w-[660px]">
+          <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[.14em] text-muted"><span
+              class="h-1.5 w-1.5 rounded-full bg-brand shadow-[0_0_12px_#ff3d3d]"></span> How it works</span>
+          <h2 class="mt-4 text-[clamp(28px,3.6vw,40px)] font-[780] leading-[1.12] tracking-[-.03em]">From a file on disk
+            to a stream in the browser.</h2>
+          <p class="mt-4 text-[16.5px] text-muted">Three moving parts. No media server daemon to babysit, no proprietary
+            format.</p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-[18px] max-[720px]:grid-cols-1">
+          <div class="reveal relative rounded-2xl border border-white/[.08] bg-white/[.018] px-6 pb-[26px] pt-7">
+            <span class="mb-4 inline-block font-mono text-[13px] font-semibold text-brand">01</span>
+            <h3 class="mb-2 text-[17px] font-bold">Upload your source</h3>
+            <p class="text-[14.5px] text-muted">POST a video file with its title, year, genre and cast. Movies and TV
+              episodes are organized on disk automatically.</p>
           </div>
-          <button class="copy cursor-pointer rounded-[7px] border border-white/[.08] bg-white/[.04] px-2.5 py-[5px] font-mono text-[11.5px] text-muted transition-colors hover:border-white/[.14] hover:text-fg" data-copy="login">copy</button>
+          <div class="reveal relative rounded-2xl border border-white/[.08] bg-white/[.018] px-6 pb-[26px] pt-7">
+            <span class="mb-4 inline-block font-mono text-[13px] font-semibold text-brand">02</span>
+            <h3 class="mb-2 text-[17px] font-bold">FFmpeg transcodes it</h3>
+            <p class="text-[14.5px] text-muted">The background queue converts the source into HLS segments and a
+              playlist, then marks the job complete.</p>
+          </div>
+          <div class="reveal relative rounded-2xl border border-white/[.08] bg-white/[.018] px-6 pb-[26px] pt-7">
+            <span class="mb-4 inline-block font-mono text-[13px] font-semibold text-brand">03</span>
+            <h3 class="mb-2 text-[17px] font-bold">Stream to your users</h3>
+            <p class="text-[14.5px] text-muted">Authenticated clients hit the streaming endpoint and play the HLS output
+              — browser, mobile app or TV client.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- API -->
+    <section class="py-[92px] max-[720px]:py-[66px]" id="api">
+      <div
+        class="mx-auto grid max-w-[1120px] grid-cols-[1fr_1.05fr] items-center gap-[52px] px-6 max-[940px]:grid-cols-1 max-[940px]:gap-9">
+        <div class="reveal min-w-0">
+          <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[.14em] text-muted"><span
+              class="h-1.5 w-1.5 rounded-full bg-brand shadow-[0_0_12px_#ff3d3d]"></span> Developer first</span>
+          <h2 class="mt-4 text-[clamp(28px,3.4vw,38px)] font-[780] leading-[1.12] tracking-[-.03em]">A clean API under
+            <span class="text-brand2">/v1/api</span></h2>
+          <p class="mt-4 max-w-[460px] text-base text-muted">Everything is JSON, errors have one consistent shape, and
+            the routes are grouped by concern. Health checks live at <code>/healthz</code> for your orchestrator.</p>
+          <ul class="mt-7 grid max-w-[460px] list-none gap-2.5 p-0">
+            <li
+              class="flex items-center gap-3 rounded-[10px] border border-white/[.08] bg-white/[.018] px-[13px] py-2.5 font-mono text-[13px] text-muted">
+              <span
+                class="shrink-0 rounded-[5px] bg-brand2/[.12] px-[7px] py-0.5 text-[10.5px] font-bold tracking-[.04em] text-brand2">POST</span>
+              /v1/api/auth/login</li>
+            <li
+              class="flex items-center gap-3 rounded-[10px] border border-white/[.08] bg-white/[.018] px-[13px] py-2.5 font-mono text-[13px] text-muted">
+              <span
+                class="shrink-0 rounded-[5px] bg-mint/[.12] px-[7px] py-0.5 text-[10.5px] font-bold tracking-[.04em] text-mint">GET</span>
+              /v1/api/videos/stream/&lt;path&gt;</li>
+            <li
+              class="flex items-center gap-3 rounded-[10px] border border-white/[.08] bg-white/[.018] px-[13px] py-2.5 font-mono text-[13px] text-muted">
+              <span
+                class="shrink-0 rounded-[5px] bg-brand2/[.12] px-[7px] py-0.5 text-[10.5px] font-bold tracking-[.04em] text-brand2">POST</span>
+              /v1/api/videos/upload</li>
+            <li
+              class="flex items-center gap-3 rounded-[10px] border border-white/[.08] bg-white/[.018] px-[13px] py-2.5 font-mono text-[13px] text-muted">
+              <span
+                class="shrink-0 rounded-[5px] bg-sky/[.12] px-[7px] py-0.5 text-[10.5px] font-bold tracking-[.04em] text-sky">PUT</span>
+              /v1/api/videos/{id}/new-episode</li>
+            <li
+              class="flex items-center gap-3 rounded-[10px] border border-white/[.08] bg-white/[.018] px-[13px] py-2.5 font-mono text-[13px] text-muted">
+              <span
+                class="shrink-0 rounded-[5px] bg-mint/[.12] px-[7px] py-0.5 text-[10.5px] font-bold tracking-[.04em] text-mint">GET</span>
+              /v1/api/videos/queue/info</li>
+          </ul>
         </div>
 
-        <pre id="code-login" class="m-0 min-h-[250px] overflow-x-auto px-[18px] py-5 font-mono text-[12.8px] leading-[1.8]">
+        <div
+          class="code-card reveal min-w-0 overflow-hidden rounded-2xl border border-white/[.14] bg-panel-grad shadow-card">
+          <div class="flex items-center justify-between border-b border-white/[.08] bg-white/[.02] px-4 py-3.5">
+            <div class="tabs flex gap-1.5">
+              <button class="active" data-tab="login">login</button>
+              <button data-tab="upload">upload</button>
+              <button data-tab="queue">queue</button>
+            </div>
+            <button
+              class="copy cursor-pointer rounded-[7px] border border-white/[.08] bg-white/[.04] px-2.5 py-[5px] font-mono text-[11.5px] text-muted transition-colors hover:border-white/[.14] hover:text-fg"
+              data-copy="login">copy</button>
+          </div>
+
+          <pre id="code-login"
+            class="m-0 min-h-[250px] overflow-x-auto px-[18px] py-5 font-mono text-[12.8px] leading-[1.8]">
 <span class="c-comment"># get a token (cookies also set)</span>
 <span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> http://localhost:7777/v1/api/auth/login \
   <span class="c-flag">-H</span> <span class="c-str">"Content-Type: application/json"</span> \
@@ -297,7 +421,8 @@
 
 <span class="c-comment"># → { "access_token": "...", "refresh_token": "..." }</span></pre>
 
-        <pre id="code-upload" class="m-0 min-h-[250px] overflow-x-auto px-[18px] py-5 font-mono text-[12.8px] leading-[1.8]" hidden>
+          <pre id="code-upload"
+            class="m-0 min-h-[250px] overflow-x-auto px-[18px] py-5 font-mono text-[12.8px] leading-[1.8]" hidden>
 <span class="c-comment"># upload a movie, kick off conversion</span>
 <span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> http://localhost:7777/v1/api/videos/upload \
   <span class="c-flag">-H</span> <span class="c-str">"Authorization: Bearer $TOKEN"</span> \
@@ -307,7 +432,8 @@
 
 <span class="c-comment"># 202 Accepted → queued for FFmpeg</span></pre>
 
-        <pre id="code-queue" class="m-0 min-h-[250px] overflow-x-auto px-[18px] py-5 font-mono text-[12.8px] leading-[1.8]" hidden>
+          <pre id="code-queue"
+            class="m-0 min-h-[250px] overflow-x-auto px-[18px] py-5 font-mono text-[12.8px] leading-[1.8]" hidden>
 <span class="c-comment"># inspect the conversion queue</span>
 <span class="c-cmd">curl</span> http://localhost:7777/v1/api/videos/queue/info \
   <span class="c-flag">-H</span> <span class="c-str">"Authorization: Bearer $TOKEN"</span>
@@ -315,134 +441,165 @@
 <span class="c-comment"># start the worker / clean finished jobs</span>
 <span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> http://localhost:7777/v1/api/videos/queue/start \
   <span class="c-flag">-H</span> <span class="c-str">"Authorization: Bearer $TOKEN"</span></pre>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- START / CTA -->
-  <section class="pb-24 max-[720px]:pb-16" id="start">
+    <!-- START / CTA -->
+    <section class="pb-24 max-[720px]:pb-16" id="start">
+      <div class="mx-auto max-w-[1120px] px-6">
+        <div
+          class="reveal relative overflow-hidden rounded-[22px] border border-white/[.14] bg-cta px-8 py-16 text-center max-[720px]:px-[22px] max-[720px]:py-12">
+          <span
+            class="inline-flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[.14em] text-muted"><span
+              class="h-1.5 w-1.5 rounded-full bg-brand shadow-[0_0_12px_#ff3d3d]"></span> Ready when you are</span>
+          <h2 class="mt-[18px] text-[clamp(28px,3.8vw,42px)] font-extrabold leading-[1.1] tracking-[-.03em]">Run it on
+            your own hardware.</h2>
+          <p class="mx-auto mt-4 max-w-[520px] text-[16.5px] text-muted">One <code>docker compose up</code> gives you
+            the API and a MongoDB instance. Bring your own TLS, storage and clients — keep full control of your media.
+          </p>
+          <div class="mt-[30px] flex flex-wrap justify-center gap-3.5">
+            <a class="inline-flex items-center justify-center gap-[9px] whitespace-nowrap rounded-[10px] border border-transparent bg-brand-grad px-[18px] py-[11px] text-sm font-[650] text-[#160405] shadow-glow transition hover:-translate-y-px hover:shadow-glow-lg max-[420px]:w-full"
+              href="https://github.com/floxflix/flixflox" target="_blank" rel="noopener">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path
+                  d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 016 0C17.3 4.6 18.3 5 18.3 5c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z" />
+              </svg>
+              View on GitHub
+            </a>
+            <a class="inline-flex items-center justify-center gap-[9px] whitespace-nowrap rounded-[10px] border border-white/[.14] bg-white/[.04] px-[18px] py-[11px] text-sm font-[650] text-fg transition hover:bg-white/[.08] max-[420px]:w-full"
+              href="https://github.com/floxflix/flixflox/blob/main/openapi.yml" target="_blank" rel="noopener">Read the
+              OpenAPI spec</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-white/[.08] pb-[34px] pt-[44px]">
     <div class="mx-auto max-w-[1120px] px-6">
-      <div class="reveal relative overflow-hidden rounded-[22px] border border-white/[.14] bg-cta px-8 py-16 text-center max-[720px]:px-[22px] max-[720px]:py-12">
-        <span class="inline-flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[.14em] text-muted"><span class="h-1.5 w-1.5 rounded-full bg-brand shadow-[0_0_12px_#ff3d3d]"></span> Ready when you are</span>
-        <h2 class="mt-[18px] text-[clamp(28px,3.8vw,42px)] font-extrabold leading-[1.1] tracking-[-.03em]">Run it on your own hardware.</h2>
-        <p class="mx-auto mt-4 max-w-[520px] text-[16.5px] text-muted">One <code>docker compose up</code> gives you the API and a MongoDB instance. Bring your own TLS, storage and clients — keep full control of your media.</p>
-        <div class="mt-[30px] flex flex-wrap justify-center gap-3.5">
-          <a class="inline-flex items-center justify-center gap-[9px] whitespace-nowrap rounded-[10px] border border-transparent bg-brand-grad px-[18px] py-[11px] text-sm font-[650] text-[#160405] shadow-glow transition hover:-translate-y-px hover:shadow-glow-lg max-[420px]:w-full" href="https://github.com/floxflix/flixflox" target="_blank" rel="noopener">
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 016 0C17.3 4.6 18.3 5 18.3 5c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
-            View on GitHub
+      <div class="flex flex-wrap items-start justify-between gap-[26px]">
+        <div>
+          <a class="flex items-center gap-[11px] text-base font-extrabold tracking-tight" href="#top">
+            <span
+              class="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-[9px] bg-brand-grad shadow-mark"><svg
+                class="ml-px h-[15px] w-[15px]" viewBox="0 0 24 24" fill="#160405" aria-hidden="true">
+                <path d="M8 5v14l11-7z" />
+              </svg></span>
+            Floxflix
           </a>
-          <a class="inline-flex items-center justify-center gap-[9px] whitespace-nowrap rounded-[10px] border border-white/[.14] bg-white/[.04] px-[18px] py-[11px] text-sm font-[650] text-fg transition hover:bg-white/[.08] max-[420px]:w-full" href="https://github.com/floxflix/flixflox/blob/main/openapi.yml" target="_blank" rel="noopener">Read the OpenAPI spec</a>
+          <p class="mt-2.5 max-w-[300px] text-[13px] text-muted2">Self-hosted video streaming API. Upload, transcode,
+            authenticate, stream.</p>
+        </div>
+        <div class="flex flex-wrap gap-x-8 gap-y-6 min-[721px]:gap-x-[56px]">
+          <div>
+            <h4 class="mb-3 text-xs font-semibold uppercase tracking-[.12em] text-muted2">Project</h4>
+            <a class="mb-[9px] block text-sm text-muted transition-colors hover:text-fg"
+              href="https://github.com/floxflix/flixflox" target="_blank" rel="noopener">flixflox</a>
+            <a class="mb-[9px] block text-sm text-muted transition-colors hover:text-fg"
+              href="https://github.com/floxflix/flixflox-ui" target="_blank" rel="noopener">flixflox-ui</a>
+            <a class="mb-[9px] block text-sm text-muted transition-colors hover:text-fg"
+              href="https://github.com/floxflix/flixflox-telegram-bot" target="_blank" rel="noopener">telegram-bot</a>
+          </div>
+          <div>
+            <h4 class="mb-3 text-xs font-semibold uppercase tracking-[.12em] text-muted2">Docs</h4>
+            <a class="mb-[9px] block text-sm text-muted transition-colors hover:text-fg"
+              href="https://github.com/floxflix/flixflox#readme" target="_blank" rel="noopener">README</a>
+            <a class="mb-[9px] block text-sm text-muted transition-colors hover:text-fg"
+              href="https://github.com/floxflix/flixflox/blob/main/openapi.yml" target="_blank"
+              rel="noopener">OpenAPI</a>
+            <a class="mb-[9px] block text-sm text-muted transition-colors hover:text-fg"
+              href="https://github.com/floxflix/flixflox/blob/main/CONTRIBUTING.md" target="_blank"
+              rel="noopener">Contributing</a>
+          </div>
+          <div>
+            <h4 class="mb-3 text-xs font-semibold uppercase tracking-[.12em] text-muted2">Community</h4>
+            <a class="mb-[9px] block text-sm text-muted transition-colors hover:text-fg"
+              href="https://github.com/floxflix/flixflox/issues" target="_blank" rel="noopener">Issues</a>
+            <a class="mb-[9px] block text-sm text-muted transition-colors hover:text-fg"
+              href="https://github.com/floxflix/flixflox/discussions" target="_blank" rel="noopener">Discussions</a>
+            <a class="mb-[9px] block text-sm text-muted transition-colors hover:text-fg"
+              href="https://github.com/floxflix/flixflox/blob/main/LICENSE" target="_blank" rel="noopener">MIT
+              License</a>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
-</main>
-
-<footer class="border-t border-white/[.08] pb-[34px] pt-[44px]">
-  <div class="mx-auto max-w-[1120px] px-6">
-    <div class="flex flex-wrap items-start justify-between gap-[26px]">
-      <div>
-        <a class="flex items-center gap-[11px] text-base font-extrabold tracking-tight" href="#top">
-          <span class="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-[9px] bg-brand-grad shadow-mark"><svg class="ml-px h-[15px] w-[15px]" viewBox="0 0 24 24" fill="#160405" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
-          Floxflix
-        </a>
-        <p class="mt-2.5 max-w-[300px] text-[13px] text-muted2">Self-hosted video streaming API. Upload, transcode, authenticate, stream.</p>
-      </div>
-      <div class="flex flex-wrap gap-x-8 gap-y-6 min-[721px]:gap-x-[56px]">
-        <div>
-          <h4 class="mb-3 text-xs font-semibold uppercase tracking-[.12em] text-muted2">Project</h4>
-          <a class="mb-[9px] block text-sm text-muted transition-colors hover:text-fg" href="https://github.com/floxflix/flixflox" target="_blank" rel="noopener">flixflox</a>
-          <a class="mb-[9px] block text-sm text-muted transition-colors hover:text-fg" href="https://github.com/floxflix/flixflox-ui" target="_blank" rel="noopener">flixflox-ui</a>
-          <a class="mb-[9px] block text-sm text-muted transition-colors hover:text-fg" href="https://github.com/floxflix/flixflox-telegram-bot" target="_blank" rel="noopener">telegram-bot</a>
-        </div>
-        <div>
-          <h4 class="mb-3 text-xs font-semibold uppercase tracking-[.12em] text-muted2">Docs</h4>
-          <a class="mb-[9px] block text-sm text-muted transition-colors hover:text-fg" href="https://github.com/floxflix/flixflox#readme" target="_blank" rel="noopener">README</a>
-          <a class="mb-[9px] block text-sm text-muted transition-colors hover:text-fg" href="https://github.com/floxflix/flixflox/blob/main/openapi.yml" target="_blank" rel="noopener">OpenAPI</a>
-          <a class="mb-[9px] block text-sm text-muted transition-colors hover:text-fg" href="https://github.com/floxflix/flixflox/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a>
-        </div>
-        <div>
-          <h4 class="mb-3 text-xs font-semibold uppercase tracking-[.12em] text-muted2">Community</h4>
-          <a class="mb-[9px] block text-sm text-muted transition-colors hover:text-fg" href="https://github.com/floxflix/flixflox/issues" target="_blank" rel="noopener">Issues</a>
-          <a class="mb-[9px] block text-sm text-muted transition-colors hover:text-fg" href="https://github.com/floxflix/flixflox/discussions" target="_blank" rel="noopener">Discussions</a>
-          <a class="mb-[9px] block text-sm text-muted transition-colors hover:text-fg" href="https://github.com/floxflix/flixflox/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
-        </div>
+      <div
+        class="mt-10 flex flex-wrap justify-between gap-3 border-t border-white/[.08] pt-[22px] text-[12.5px] text-muted2 max-[560px]:flex-col max-[560px]:gap-1">
+        <span>&copy; <span id="year">2026</span> Floxflix · Released under the MIT License.</span>
+        <span>Built for people who host their own media.</span>
       </div>
     </div>
-    <div class="mt-10 flex flex-wrap justify-between gap-3 border-t border-white/[.08] pt-[22px] text-[12.5px] text-muted2 max-[560px]:flex-col max-[560px]:gap-1">
-      <span>&copy; <span id="year">2026</span> Floxflix · Released under the MIT License.</span>
-      <span>Built for people who host their own media.</span>
-    </div>
-  </div>
-</footer>
+  </footer>
 
-<script>
-  (function () {
-    var year = document.getElementById('year');
-    if (year) year.textContent = new Date().getFullYear();
+  <script>
+    (function () {
+      var year = document.getElementById('year');
+      if (year) year.textContent = new Date().getFullYear();
 
-    var toggle = document.getElementById('menuToggle');
-    var links = document.getElementById('navlinks');
-    if (toggle && links) {
-      toggle.addEventListener('click', function () {
-        var open = links.classList.toggle('open');
-        toggle.setAttribute('aria-expanded', String(open));
-      });
-      links.querySelectorAll('a').forEach(function (a) {
-        a.addEventListener('click', function () {
-          links.classList.remove('open');
-          toggle.setAttribute('aria-expanded', 'false');
+      var toggle = document.getElementById('menuToggle');
+      var links = document.getElementById('navlinks');
+      if (toggle && links) {
+        toggle.addEventListener('click', function () {
+          var open = links.classList.toggle('open');
+          toggle.setAttribute('aria-expanded', String(open));
         });
-      });
-    }
-
-    var tabs = document.querySelectorAll('.code-card .tabs button');
-    var copy = document.querySelector('.copy');
-    var panes = { login: 'code-login', upload: 'code-upload', queue: 'code-queue' };
-
-    tabs.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        tabs.forEach(function (b) { b.classList.remove('active'); });
-        btn.classList.add('active');
-        var tab = btn.getAttribute('data-tab');
-        Object.keys(panes).forEach(function (key) {
-          document.getElementById(panes[key]).hidden = key !== tab;
-        });
-        if (copy) copy.setAttribute('data-copy', tab);
-      });
-    });
-
-    if (copy) {
-      copy.addEventListener('click', function () {
-        var active = document.querySelector('.code-card .tabs button.active');
-        var tab = active ? active.getAttribute('data-tab') : 'login';
-        var el = document.getElementById(panes[tab]);
-        var text = el ? el.innerText : '';
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(text).then(function () {
-            var old = copy.textContent;
-            copy.textContent = 'copied';
-            setTimeout(function () { copy.textContent = old; }, 1400);
+        links.querySelectorAll('a').forEach(function (a) {
+          a.addEventListener('click', function () {
+            links.classList.remove('open');
+            toggle.setAttribute('aria-expanded', 'false');
           });
-        }
-      });
-    }
+        });
+      }
 
-    var reveals = document.querySelectorAll('.reveal');
-    if ('IntersectionObserver' in window) {
-      var io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (e) {
-          if (e.isIntersecting) {
-            e.target.classList.add('in');
-            io.unobserve(e.target);
+      var tabs = document.querySelectorAll('.code-card .tabs button');
+      var copy = document.querySelector('.copy');
+      var panes = { login: 'code-login', upload: 'code-upload', queue: 'code-queue' };
+
+      tabs.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          tabs.forEach(function (b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          var tab = btn.getAttribute('data-tab');
+          Object.keys(panes).forEach(function (key) {
+            document.getElementById(panes[key]).hidden = key !== tab;
+          });
+          if (copy) copy.setAttribute('data-copy', tab);
+        });
+      });
+
+      if (copy) {
+        copy.addEventListener('click', function () {
+          var active = document.querySelector('.code-card .tabs button.active');
+          var tab = active ? active.getAttribute('data-tab') : 'login';
+          var el = document.getElementById(panes[tab]);
+          var text = el ? el.innerText : '';
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              var old = copy.textContent;
+              copy.textContent = 'copied';
+              setTimeout(function () { copy.textContent = old; }, 1400);
+            });
           }
         });
-      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-      reveals.forEach(function (el) { io.observe(el); });
-    } else {
-      reveals.forEach(function (el) { el.classList.add('in'); });
-    }
-  })();
-</script>
+      }
+
+      var reveals = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) {
+              e.target.classList.add('in');
+              io.unobserve(e.target);
+            }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+        reveals.forEach(function (el) { io.observe(el); });
+      } else {
+        reveals.forEach(function (el) { el.classList.add('in'); });
+      }
+    })();
+  </script>
 </body>
+
 </html>
