@@ -1,9 +1,9 @@
 :root {
-  --fg: #e7e9ee;
-  --muted2: #6f7683;
-  --brand2: #ff8a3d;
-  --mint: hsl(134, 77%, 64%);
-  --sky: #6aa8ff
+  --fg: #e9edee;
+  --muted2: #707777;
+  --brand2: #46e6e2;
+  --mint: #2ed6a4;
+  --sky: #5cc8ff
 }
 
 .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
@@ -24,12 +24,12 @@
 .tabs button.active { background: rgb(255 255 255 / .06); color: var(--fg); }
 
 .c-comment { color: var(--muted2); }
-.c-cmd { color: #e7e9ee; }
+.c-cmd { color: #e9edee; }
 .c-flag { color: var(--brand2); }
 .c-str { color: var(--mint); }
 .c-key { color: var(--sky); }
 
-::selection { background: rgba(255, 61, 61, .35); }
+::selection { background: rgba(9, 195, 194, .35); }
 
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
