@@ -4,9 +4,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Floxflix — Self-hosted video streaming API</title>
+  <title>Floxflix — Self-hosted video streaming server</title>
   <meta name="description"
-    content="Floxflix is a self-hosted video streaming API written in Go. Upload source files, transcode to HLS with FFmpeg, and stream to authenticated users. Open source, Docker ready, MIT licensed." />
+    content="Floxflix is a self-hosted video streaming server written in Go, with a React web UI bundled in the same image. Upload source files, transcode to HLS with FFmpeg, and stream to authenticated users. Open source, Docker ready, MIT licensed." />
   <meta name="theme-color" content="#171717" />
   <link rel="icon"
     href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2309c3c2'/%3E%3Cpath d='M26 20l20 12-20 12z' fill='%23171717'/%3E%3C/svg%3E" />
@@ -134,9 +134,9 @@
             video.<br />Your server.<br /><span class="bg-brand-text bg-clip-text text-transparent">Your rules.</span>
           </h1>
           <p class="reveal mt-[22px] max-w-[540px] text-lg text-muted">
-            Floxflix is a self-hosted video streaming API written in Go. Upload source files,
-            let FFmpeg transcode them to HLS in the background, and stream to your own users —
-            with authenticated profiles and zero third-party cloud.
+            Floxflix is a self-hosted video streaming server written in Go, with a React web app baked
+            into the same image. Upload source files, let FFmpeg transcode them to HLS in the
+            background, and stream to your own users — authenticated profiles, zero third-party cloud.
           </p>
           <div class="reveal mt-[34px] flex flex-wrap gap-3.5">
             <a class="inline-flex items-center justify-center gap-[9px] whitespace-nowrap rounded-[10px] border border-transparent bg-brand-grad px-[18px] py-[11px] text-sm font-[650] text-[#04201f] shadow-glow transition hover:-translate-y-px hover:shadow-glow-lg max-[420px]:w-full"
@@ -159,6 +159,11 @@
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
                 stroke-linejoin="round">
                 <path d="M20 6L9 17l-5-5" />
+              </svg> Bundled web UI</span>
+            <span class="inline-flex items-center gap-[7px]"><svg class="h-[15px] w-[15px] text-mint"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M20 6L9 17l-5-5" />
               </svg> No vendor lock-in</span>
             <span class="inline-flex items-center gap-[7px]"><svg class="h-[15px] w-[15px] text-mint"
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
@@ -176,17 +181,18 @@
               class="h-[11px] w-[11px] rounded-full bg-[#28c840]"></span>
             <span class="ml-2 font-mono text-xs text-muted2">~/floxflix</span>
           </div>
-          <pre class="m-0 overflow-x-auto px-[18px] py-5 font-mono text-[13px] leading-[1.85]"><span class="c-comment"># clone the repo</span>
-<span class="c-cmd">git clone</span> <span class="c-str">https://github.com/floxflix/floxflix</span>
+          <pre class="m-0 overflow-x-auto px-[18px] py-5 font-mono text-[13px] leading-[1.85]"><span class="c-comment"># clone the repo (UI is a submodule)</span>
+<span class="c-cmd">git clone</span> <span class="c-flag">--recursive</span> <span class="c-str">https://github.com/floxflix/floxflix</span>
 <span class="c-cmd">cd</span> floxflix
 
 <span class="c-comment"># set the required secret</span>
 <span class="c-cmd">export</span> <span class="c-key">JWT_SECRET_KEY</span>=<span class="c-str">$(openssl rand -base64 48)</span>
 
-<span class="c-comment"># start API + MongoDB</span>
+<span class="c-comment"># start API, web UI + MongoDB</span>
 <span class="c-cmd">docker compose up</span> <span class="c-flag">--build</span>
 
-<span class="c-comment">✔ API listening on http://localhost:7777</span>
+<span class="c-comment">✔ UI + API on http://localhost:7777</span>
+<span class="c-comment"># first run: create an account at /register</span>
 <span class="cursor inline-block h-[15px] w-2 animate-blink bg-brand align-[-2px]"></span></pre>
         </div>
       </div>
@@ -206,6 +212,8 @@
               class="h-[5px] w-[5px] rounded-full bg-brand opacity-70"></i>MongoDB 8</span>
           <span class="inline-flex items-center gap-2 font-mono text-[13.5px] text-muted"><i
               class="h-[5px] w-[5px] rounded-full bg-brand opacity-70"></i>chi router</span>
+          <span class="inline-flex items-center gap-2 font-mono text-[13.5px] text-muted"><i
+              class="h-[5px] w-[5px] rounded-full bg-brand opacity-70"></i>React &middot; Vite</span>
           <span class="inline-flex items-center gap-2 font-mono text-[13.5px] text-muted"><i
               class="h-[5px] w-[5px] rounded-full bg-brand opacity-70"></i>Docker</span>
         </div>
@@ -235,7 +243,7 @@
                   d="M4 7V5a2 2 0 012-2h2M4 17v2a2 2 0 002 2h2M20 7V5a2 2 0 00-2-2h-2M20 17v2a2 2 0 01-2 2h-2M10 9l5 3-5 3z" />
               </svg></div>
             <h3 class="mb-2 text-[16.5px] font-bold tracking-[-.01em]">HLS streaming</h3>
-            <p class="text-[14.5px] leading-[1.65] text-muted">Source files are transcoded to adaptive HLS segments and
+            <p class="text-[14.5px] leading-[1.65] text-muted">Source files are transcoded to HLS segments and
               served as <code>.m3u8</code>, <code>.ts</code>, <code>.m4s</code> or <code>.mp4</code> — playable in any
               modern browser or player.</p>
           </article>
@@ -280,8 +288,8 @@
               </svg></div>
             <h3 class="mb-2 text-[16.5px] font-bold tracking-[-.01em]">Upload &amp; transcode</h3>
             <p class="text-[14.5px] leading-[1.65] text-muted">Multipart uploads for <code>mp4</code>, <code>mkv</code>,
-              <code>mov</code>, <code>avi</code>, <code>webm</code> and more. FFmpeg converts every file automatically —
-              no manual encoding.</p>
+              <code>mov</code>, <code>avi</code>, <code>webm</code> and more. Files already on the server can be
+              registered without re-uploading, and FFmpeg converts everything automatically.</p>
           </article>
 
           <article
@@ -304,12 +312,13 @@
               class="mb-[18px] grid h-[42px] w-[42px] place-items-center rounded-[11px] border border-brand/20 bg-brand/10 text-brand2">
               <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                 stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 19V5a2 2 0 012-2h9l5 5v11a2 2 0 01-2 2H6a2 2 0 01-2-2z" />
-                <path d="M14 3v6h6M8 13h8M8 17h5" />
+                <rect x="3" y="4" width="18" height="13" rx="2" />
+                <path d="M8 21h8M12 17v4" />
               </svg></div>
-            <h3 class="mb-2 text-[16.5px] font-bold tracking-[-.01em]">OpenAPI contract</h3>
-            <p class="text-[14.5px] leading-[1.65] text-muted">A complete <code>openapi.yml</code> and Postman
-              collection ship with the project. Point Swagger, Redoc or your own client generator at it.</p>
+            <h3 class="mb-2 text-[16.5px] font-bold tracking-[-.01em]">Bundled web UI</h3>
+            <p class="text-[14.5px] leading-[1.65] text-muted">A React + Vite app with a Netflix-style catalog,
+              profiles and an admin dashboard, embedded in the Go binary. One image, one port, no CORS setup — or run
+              the standalone <code>floxflix-ui</code> instead.</p>
           </article>
         </div>
       </div>
@@ -331,8 +340,8 @@
           <div class="reveal relative rounded-2xl border border-white/[.08] bg-white/[.018] px-6 pb-[26px] pt-7">
             <span class="mb-4 inline-block font-mono text-[13px] font-semibold text-brand">01</span>
             <h3 class="mb-2 text-[17px] font-bold">Upload your source</h3>
-            <p class="text-[14.5px] text-muted">POST a video file with its title, year, genre and cast. Movies and TV
-              episodes are organized on disk automatically.</p>
+            <p class="text-[14.5px] text-muted">Upload from the bundled web app or POST a video file with its title,
+              year, genre and cast. Movies and TV episodes are organized on disk automatically.</p>
           </div>
           <div class="reveal relative rounded-2xl border border-white/[.08] bg-white/[.018] px-6 pb-[26px] pt-7">
             <span class="mb-4 inline-block font-mono text-[13px] font-semibold text-brand">02</span>
@@ -343,8 +352,8 @@
           <div class="reveal relative rounded-2xl border border-white/[.08] bg-white/[.018] px-6 pb-[26px] pt-7">
             <span class="mb-4 inline-block font-mono text-[13px] font-semibold text-brand">03</span>
             <h3 class="mb-2 text-[17px] font-bold">Stream to your users</h3>
-            <p class="text-[14.5px] text-muted">Authenticated clients hit the streaming endpoint and play the HLS output
-              — browser, mobile app or TV client.</p>
+            <p class="text-[14.5px] text-muted">Open the bundled web app, or point any authenticated client at the
+              streaming endpoint and play the HLS output — browser, mobile app or TV.</p>
           </div>
         </div>
       </div>
@@ -360,7 +369,9 @@
           <h2 class="mt-4 text-[clamp(28px,3.4vw,38px)] font-[780] leading-[1.12] tracking-[-.03em]">A clean API under
             <span class="text-brand2">/v1/api</span></h2>
           <p class="mt-4 max-w-[460px] text-base text-muted">Everything is JSON, errors have one consistent shape, and
-            the routes are grouped by concern. Health checks live at <code>/healthz</code> for your orchestrator.</p>
+            the routes are grouped by concern — auth, users, viewers, videos, genres and cast. Health checks live at
+            <code>/healthz</code> for your orchestrator, and a complete <code>openapi.yml</code> covers every route for
+            Swagger, Redoc or a client generator.</p>
           <ul class="mt-7 grid max-w-[460px] list-none gap-2.5 p-0">
             <li
               class="flex items-center gap-3 rounded-[10px] border border-white/[.08] bg-white/[.018] px-[13px] py-2.5 font-mono text-[13px] text-muted">
@@ -424,7 +435,7 @@
   <span class="c-flag">-F</span> <span class="c-str">"type=movie"</span> \
   <span class="c-flag">-F</span> <span class="c-str">'values={"title":"Arrival","release_year":2016}'</span>
 
-<span class="c-comment"># 202 Accepted → queued for FFmpeg</span></pre>
+<span class="c-comment"># 201 Created → queued for FFmpeg</span></pre>
 
           <pre id="code-queue"
             class="m-0 min-h-[250px] overflow-x-auto px-[18px] py-5 font-mono text-[12.8px] leading-[1.8]" hidden>
@@ -432,8 +443,11 @@
 <span class="c-cmd">curl</span> http://localhost:7777/v1/api/videos/queue/info \
   <span class="c-flag">-H</span> <span class="c-str">"Authorization: Bearer $TOKEN"</span>
 
-<span class="c-comment"># start the worker / clean finished jobs</span>
+<span class="c-comment"># start the worker, then clean finished jobs</span>
 <span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> http://localhost:7777/v1/api/videos/queue/start \
+  <span class="c-flag">-H</span> <span class="c-str">"Authorization: Bearer $TOKEN"</span>
+
+<span class="c-cmd">curl</span> <span class="c-flag">-X POST</span> http://localhost:7777/v1/api/videos/queue/cleanup \
   <span class="c-flag">-H</span> <span class="c-str">"Authorization: Bearer $TOKEN"</span></pre>
         </div>
       </div>
@@ -449,8 +463,9 @@
               class="h-1.5 w-1.5 rounded-full bg-brand shadow-[0_0_12px_#09c3c2]"></span> Ready when you are</span>
           <h2 class="mt-[18px] text-[clamp(28px,3.8vw,42px)] font-extrabold leading-[1.1] tracking-[-.03em]">Run it on
             your own hardware.</h2>
-          <p class="mx-auto mt-4 max-w-[520px] text-[16.5px] text-muted">One <code>docker compose up</code> gives you
-            the API and a MongoDB instance. Bring your own TLS, storage and clients — keep full control of your media.
+          <p class="mx-auto mt-4 max-w-[520px] text-[16.5px] text-muted">One <code>docker compose up</code> — or a single
+            <code>docker pull ghcr.io/floxflix/floxflix</code> — gives you the API, the web UI and MongoDB. Bring your own
+            TLS, storage and clients, and keep full control of your media.
           </p>
           <div class="mt-[30px] flex flex-wrap justify-center gap-3.5">
             <a class="inline-flex items-center justify-center gap-[9px] whitespace-nowrap rounded-[10px] border border-transparent bg-brand-grad px-[18px] py-[11px] text-sm font-[650] text-[#04201f] shadow-glow transition hover:-translate-y-px hover:shadow-glow-lg max-[420px]:w-full"
@@ -477,8 +492,8 @@
           <a class="flex items-center" href="#top" aria-label="Floxflix home">
             <img src="floxflix-logo.png" alt="Floxflix" width="1076" height="312" class="h-[26px] w-auto" />
           </a>
-          <p class="mt-2.5 max-w-[300px] text-[13px] text-muted2">Self-hosted video streaming API. Upload, transcode,
-            authenticate, stream.</p>
+          <p class="mt-2.5 max-w-[300px] text-[13px] text-muted2">Self-hosted video streaming server with a bundled web
+            UI. Upload, transcode, authenticate, stream.</p>
         </div>
         <div class="flex flex-wrap gap-x-8 gap-y-6 min-[721px]:gap-x-[56px]">
           <div>
